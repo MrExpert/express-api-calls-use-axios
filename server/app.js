@@ -1,34 +1,35 @@
 const express = require('express');
 const morgan = require('morgan');
 const axios = require('axios');
-
-let imdbID;
-// let data;
-const m = new Map();
-
 const app = express();
 
 app.use(morgan('dev'));
 
-app.get('/', function(req, res){
-    imdbID = req.query.i;
-   if (imdbID && m.has('data')) {
-       return m;
-    } else {
-    axios
-    .get('http://www.omdbapi.com/?i=' + imdbID + '&apikey=8730e0e')
-    .then( (response) => {
-        res.send(response.data);
-        
-        m.set('data', response.data);
+app.get('/', (req, res) => {
+  let imdbTitle = (req.query.t);    // anyting after " ?t "  ?t= jhvvvvvmvbnn
+  let imdbID = (req.query.i);       // anyting after " ?i= "
+
+if (imdbTitle) {
+  axios
+    .get("http://www.omdbapi.com/?t=" + imdbTitle + "&apikey=8730e0e")
+    .then(response => {
+      res.json(response.data);
     })
-    .catch((error) => {
-        console.log(error);
+    .catch(error => {
+      console.log('this is Title error:' + error);
     });
-   }
-
-});  
-
-
+} else if (imdbID){
+    axios
+    .get("http://www.omdbapi.com/?i=" + imdbID + "&apikey=8730e0e")
+    .then(response => {
+      res.json(response.data);
+    })
+    .catch(error => {
+      console.log('this is an ID error:' + error);
+    });
+} else  {
+    res.end("Dont have any data ")
+}
+});
 
 module.exports = app;
